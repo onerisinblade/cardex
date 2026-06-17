@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#3d5a80"/>
+  <rect x="116" y="104" width="280" height="304" rx="32" fill="#ffffff" opacity="0.96"/>
+  <rect x="148" y="148" width="216" height="32" rx="16" fill="#e8f0fe"/>
+  <text x="256" y="300" text-anchor="middle" font-family="Georgia,serif" font-size="104" fill="#3d5a80">∫</text>
+  <text x="256" y="356" text-anchor="middle" font-family="Arial,sans-serif" font-size="42" font-weight="700" fill="#3d5a80">dx</text>
+</svg>

@@ -1,0 +1,17 @@
+{
+  "name": "Карточки по математике",
+  "short_name": "Карточки",
+  "description": "Мини-Anki для подготовки к экзамену: интегралы, свои колоды, светлая и тёмная тема.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f0f4f8",
+  "theme_color": "#3d5a80",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
