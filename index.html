@@ -593,6 +593,14 @@ body.dark .card-item-actions button.delete-btn:hover {
           <span id="import-status" class="import-status"></span>
         </div>
       </div>
+      <div class="import-panel">
+        <h2>Экспорт колоды</h2>
+        <p class="import-hint">Скачает выбранную колоду в .txt формате <b>Вопрос | Ответ</b>. Потом этот файл можно импортировать на другом устройстве.</p>
+        <div class="import-actions">
+          <button id="btn-export" type="button">Экспортировать</button>
+          <span id="export-status" class="import-status"></span>
+        </div>
+      </div>
       <div class="manage-header">
         <h2>&#1052;&#1086;&#1080; &#1082;&#1072;&#1088;&#1090;&#1086;&#1095;&#1082;&#1080; (<span id="card-count">0</span>)</h2>
         <button id="btn-reset-defaults" class="danger">&#1057;&#1073;&#1088;&#1086;&#1089;&#1080;&#1090;&#1100; &#1082; &#1090;&#1072;&#1073;&#1083;&#1080;&#1094;&#1077;</button>
@@ -628,6 +636,7 @@ const T = {
   cannotDeleteDefault: 'Колоду с интегралами удалить нельзя.',
   importNoCards: 'Не нашёл карточки. Проверь формат: Вопрос | Ответ, одна карточка на строку.',
   importError: 'Не получилось прочитать файл.',
+  exportNoCards: 'В этой колоде пока нет карточек для экспорта.',
 };
 
 const DECK_META = {
@@ -1193,6 +1202,47 @@ function importCardsFromFile(file) {
   reader.readAsText(file, 'UTF-8');
 }
 
+function normalizeExportText(value) {
+  return String(value || '').replace(/\r?\n/g, ' ').trim();
+}
+
+function makeSafeFilename(name) {
+  const cleaned = String(name || 'deck')
+    .trim()
+    .replace(/[\\/:*?"<>|]/g, '')
+    .replace(/\s+/g, '-')
+    .toLowerCase();
+  return `${cleaned || 'deck'}.txt`;
+}
+
+function exportActiveDeck() {
+  const cards = getCards();
+  const status = document.getElementById('export-status');
+
+  if (!cards.length) {
+    if (status) status.textContent = '';
+    alert(T.exportNoCards);
+    return;
+  }
+
+  const meta = getDeckMeta(getActiveDeckId());
+  const text = cards
+    .map((card) => `${normalizeExportText(card.front)} | ${normalizeExportText(card.back)}`)
+    .join('\n');
+
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = makeSafeFilename(meta.name);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  if (status) status.textContent = `Скачано: ${cards.length}`;
+}
+
 function applyTheme(theme) {
   const dark = theme === 'dark';
   document.body.classList.toggle('dark', dark);
@@ -1226,6 +1276,7 @@ document.getElementById('import-file').addEventListener('change', (e) => {
   importCardsFromFile(file);
   e.target.value = '';
 });
+document.getElementById('btn-export').addEventListener('click', exportActiveDeck);
 
 document.querySelectorAll('.tab').forEach((tab) => {
   tab.addEventListener('click', () => {
