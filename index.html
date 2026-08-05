@@ -749,6 +749,7 @@ let appData = { activeDeck: 'integrals', decks: {} };
 let studyOrder = [];
 let studyIndex = 0;
 let flipped = false;
+let studyMode = 'ordered';
 
 const memoryStorage = {};
 let useMemoryStorage = false;
@@ -1007,15 +1008,28 @@ function finishInstantFlipReset(flashcard) {
   });
 }
 
+function createStudyOrder(cards, shuffle = false, avoidFirstCardIndex = null) {
+  const order = cards.map((_, i) => i);
+
+  if (!shuffle) return order;
+
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+
+  // Чтобы на стыке двух случайных кругов та же карточка не повторялась сразу подряд.
+  if (order.length > 1 && avoidFirstCardIndex !== null && order[0] === avoidFirstCardIndex) {
+    [order[0], order[1]] = [order[1], order[0]];
+  }
+
+  return order;
+}
+
 function resetStudyOrder(shuffle = false) {
   const cards = getCards();
-  studyOrder = cards.map((_, i) => i);
-  if (shuffle) {
-    for (let i = studyOrder.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [studyOrder[i], studyOrder[j]] = [studyOrder[j], studyOrder[i]];
-    }
-  }
+  studyMode = shuffle ? 'random' : 'ordered';
+  studyOrder = createStudyOrder(cards, shuffle);
   studyIndex = 0;
   flipped = false;
   updateStudyCard(true);
@@ -1063,8 +1077,21 @@ function flipCard() {
 function nextCard() {
   const cards = getCards();
   if (cards.length === 0) return;
+
   flipped = false;
-  studyIndex = (studyIndex + 1) % cards.length;
+
+  if (studyMode === 'random') {
+    if (studyIndex >= studyOrder.length - 1) {
+      const lastCardIndex = studyOrder[studyIndex];
+      studyOrder = createStudyOrder(cards, true, lastCardIndex);
+      studyIndex = 0;
+    } else {
+      studyIndex += 1;
+    }
+  } else {
+    studyIndex = (studyIndex + 1) % cards.length;
+  }
+
   updateStudyCard(true);
 }
 
