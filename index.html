@@ -156,6 +156,7 @@ nav {
 }
 
 .label {
+  display: none;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -171,6 +172,7 @@ nav {
 }
 
 .hint {
+  display: none;
   text-align: center;
   color: #888;
   font-size: 0.85rem;
@@ -237,7 +239,8 @@ button.small {
   color: #555;
 }
 
-.add-form input {
+.add-form input,
+.add-form textarea {
   display: block;
   width: 100%;
   margin-top: 4px;
@@ -246,6 +249,12 @@ button.small {
   border-radius: 6px;
   font-family: "Consolas", monospace;
   font-size: 0.9rem;
+}
+
+.add-form textarea {
+  min-height: 86px;
+  resize: vertical;
+  line-height: 1.45;
 }
 
 .import-hint {
@@ -340,7 +349,8 @@ button.small {
   width: 100%;
 }
 
-.edit-form input {
+.edit-form input,
+.edit-form textarea {
   width: 100%;
   padding: 6px 10px;
   border: 1px solid #ccc;
@@ -348,6 +358,12 @@ button.small {
   font-family: "Consolas", monospace;
   font-size: 0.85rem;
   margin-bottom: 6px;
+}
+
+.edit-form textarea {
+  min-height: 74px;
+  resize: vertical;
+  line-height: 1.45;
 }
 
 .edit-form .edit-actions {
@@ -430,6 +446,46 @@ button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
   }
 }
 
+
+.card-face {
+  overflow-y: auto;
+}
+
+.card-front .math,
+.card-back .math {
+  width: 100%;
+}
+
+.card-answer-main {
+  font-size: 1.38rem;
+  font-weight: 650;
+  line-height: 1.35;
+  white-space: pre-wrap;
+}
+
+.card-note {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(61, 90, 128, 0.18);
+  font-size: 0.96rem;
+  font-weight: 400;
+  line-height: 1.45;
+  color: #53627a;
+  white-space: pre-wrap;
+}
+
+.explanation-field.hidden {
+  display: none;
+}
+
+.card-item-note {
+  margin-top: 4px;
+  white-space: pre-wrap;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: #667085;
+}
+
 .math.plain-text {
   font-family: "Segoe UI", system-ui, sans-serif;
   font-size: 1.15rem;
@@ -457,7 +513,9 @@ body.dark .card-item-content .row span:first-child {
 
 body.dark .deck-select select,
 body.dark .add-form input,
-body.dark .edit-form input {
+body.dark .add-form textarea,
+body.dark .edit-form input,
+body.dark .edit-form textarea {
   background: #101827;
   color: #f4f7fb;
   border-color: #334155;
@@ -495,11 +553,20 @@ body.dark .card-back {
   border-color: #5c7cfa;
 }
 
+body.dark .card-note {
+  border-top-color: rgba(143, 183, 255, 0.22);
+}
+
 body.dark .card-face,
 body.dark .add-form,
 body.dark .import-panel,
 body.dark .card-item {
   box-shadow: 0 4px 22px rgba(0, 0, 0, 0.35);
+}
+
+body.dark .card-note,
+body.dark .card-item-note {
+  color: #aebbd0;
 }
 
 body.dark #study-progress {
@@ -576,17 +643,21 @@ body.dark .card-item-actions button.delete-btn:hover {
         <h2>&#1044;&#1086;&#1073;&#1072;&#1074;&#1080;&#1090;&#1100; &#1082;&#1072;&#1088;&#1090;&#1086;&#1095;&#1082;&#1091;</h2>
         <label>
           <span id="input-front-label">&#1051;&#1080;&#1094;&#1077;&#1074;&#1072;&#1103; &#1089;&#1090;&#1086;&#1088;&#1086;&#1085;&#1072;</span> <span class="format-hint">(LaTeX)</span>
-          <input type="text" id="input-front" placeholder="\int x^n dx" required>
+          <textarea id="input-front" placeholder="\int x^n dx" required rows="3"></textarea>
         </label>
         <label>
           <span id="input-back-label">&#1054;&#1073;&#1088;&#1072;&#1090;&#1085;&#1072;&#1103; &#1089;&#1090;&#1086;&#1088;&#1086;&#1085;&#1072;</span> <span class="format-hint">(LaTeX)</span>
-          <input type="text" id="input-back" placeholder="\frac{x^{n+1}}{n+1}" required>
+          <textarea id="input-back" placeholder="\frac{x^{n+1}}{n+1}" required rows="3"></textarea>
+        </label>
+        <label id="input-note-wrap" class="explanation-field hidden">
+          <span id="input-note-label">Пояснение</span>
+          <textarea id="input-note" placeholder="Примеры, пояснение или детали" rows="3"></textarea>
         </label>
         <button type="submit">&#1044;&#1086;&#1073;&#1072;&#1074;&#1080;&#1090;&#1100;</button>
       </form>
       <div class="import-panel">
         <h2>Импорт карточек</h2>
-        <p class="import-hint">Загрузи .txt файл: одна карточка на строку, формат <b>Вопрос | Ответ</b>. Карточки добавятся в выбранную колоду.</p>
+        <p class="import-hint">Загрузи .txt файл: одна карточка на строку, формат <b>Вопрос | Ответ | Пояснение</b>. Карточки добавятся в выбранную колоду.</p>
         <div class="import-actions">
           <input type="file" id="import-file" accept=".txt,text/plain" hidden>
           <button id="btn-import" type="button">Импортировать</button>
@@ -595,7 +666,7 @@ body.dark .card-item-actions button.delete-btn:hover {
       </div>
       <div class="import-panel">
         <h2>Экспорт колоды</h2>
-        <p class="import-hint">Скачает выбранную колоду в .txt формате <b>Вопрос | Ответ</b>. Потом этот файл можно импортировать на другом устройстве.</p>
+        <p class="import-hint">Скачает выбранную колоду в .txt формате <b>Вопрос | Ответ | Пояснение</b>. Переносы строк сохраняются как \n и восстановятся при импорте.</p>
         <div class="import-actions">
           <button id="btn-export" type="button">Экспортировать</button>
           <span id="export-status" class="import-status"></span>
@@ -634,7 +705,7 @@ const T = {
   newDeckPrompt: 'Название новой колоды:',
   deleteDeckConfirm: 'Удалить эту колоду вместе со всеми карточками?',
   cannotDeleteDefault: 'Колоду с интегралами удалить нельзя.',
-  importNoCards: 'Не нашёл карточки. Проверь формат: Вопрос | Ответ, одна карточка на строку.',
+  importNoCards: 'Не нашёл карточки. Проверь формат: Вопрос | Ответ | Пояснение, одна карточка на строку.',
   importError: 'Не получилось прочитать файл.',
   exportNoCards: 'В этой колоде пока нет карточек для экспорта.',
 };
@@ -650,6 +721,9 @@ const DECK_META = {
     backInput: 'Первообразная',
     frontPh: '\\int x^n \\, dx',
     backPh: '\\frac{x^{n+1}}{n+1}',
+    noteInput: 'Пояснение',
+    notePh: 'Для таблицы интегралов не используется',
+    showNote: false,
     defaultCards: [
       { front: '\\int x^n \\, dx', back: '\\frac{x^{n+1}}{n+1},\\; n \\neq -1' },
       { front: '\\int \\frac{dx}{x}', back: '\\ln |x|' },
@@ -731,7 +805,10 @@ function getDeckMeta(id) {
     frontInput: 'Вопрос',
     backInput: 'Ответ',
     frontPh: 'Например: Что такое производная?',
-    backPh: 'Например: Скорость изменения функции',
+    backPh: 'Например: Speed of change',
+    noteInput: 'Пояснение',
+    notePh: 'Например: примеры использования, детали, подсказки',
+    showNote: true,
     defaultCards: [],
   };
 }
@@ -852,6 +929,17 @@ function updateDeckLabels() {
   document.getElementById('input-back-label').textContent = meta.backInput;
   document.getElementById('input-front').placeholder = meta.frontPh;
   document.getElementById('input-back').placeholder = meta.backPh;
+
+  const noteWrap = document.getElementById('input-note-wrap');
+  const noteInput = document.getElementById('input-note');
+  const noteLabel = document.getElementById('input-note-label');
+  if (noteWrap && noteInput && noteLabel) {
+    const showNote = meta.type !== 'latex';
+    noteWrap.classList.toggle('hidden', !showNote);
+    noteInput.placeholder = meta.notePh || 'Примеры, пояснение или детали';
+    noteLabel.textContent = meta.noteInput || 'Пояснение';
+  }
+
   document.querySelectorAll('.format-hint').forEach((el) => {
     el.textContent = meta.type === 'latex' ? '(LaTeX)' : '';
   });
@@ -877,7 +965,33 @@ function renderCardContent(el, content) {
   if (meta.type === 'latex') {
     renderMath(el, content);
   } else {
-    el.textContent = content;
+    el.textContent = content || '';
+  }
+}
+
+function renderBackContent(el, card) {
+  const meta = getDeckMeta(getActiveDeckId());
+  el.innerHTML = '';
+  el.textContent = '';
+
+  if (meta.type === 'latex') {
+    el.classList.remove('plain-text');
+    renderMath(el, card.back || '');
+    return;
+  }
+
+  el.classList.add('plain-text');
+
+  const main = document.createElement('div');
+  main.className = 'card-answer-main';
+  main.textContent = card.back || '';
+  el.appendChild(main);
+
+  if (card.note && String(card.note).trim()) {
+    const note = document.createElement('div');
+    note.className = 'card-note';
+    note.textContent = String(card.note).trim();
+    el.appendChild(note);
   }
 }
 
@@ -931,7 +1045,7 @@ function updateStudyCard(forceFront = false) {
 
   const card = cards[studyOrder[studyIndex]];
   renderCardContent(frontEl, card.front);
-  renderCardContent(backEl, card.back);
+  renderBackContent(backEl, card);
   progress.textContent = `${studyIndex + 1} / ${cards.length}`;
 
   flashcard.classList.toggle('flipped', flipped);
@@ -1044,6 +1158,13 @@ function renderCardList() {
     content.appendChild(rowFront);
     content.appendChild(rowBack);
 
+    if (meta.type !== 'latex' && card.note && String(card.note).trim()) {
+      const noteRow = document.createElement('div');
+      noteRow.className = 'card-item-note';
+      noteRow.textContent = `Пояснение: ${String(card.note).trim()}`;
+      content.appendChild(noteRow);
+    }
+
     const actions = document.createElement('div');
     actions.className = 'card-item-actions';
 
@@ -1095,6 +1216,14 @@ function renderCardList() {
   });
 }
 
+function createTextarea(value, placeholder, rows = 3) {
+  const textarea = document.createElement('textarea');
+  textarea.value = value || '';
+  textarea.placeholder = placeholder || '';
+  textarea.rows = rows;
+  return textarea;
+}
+
 function startEdit(li, index) {
   const cards = getCards();
   const meta = getDeckMeta(getActiveDeckId());
@@ -1104,13 +1233,9 @@ function startEdit(li, index) {
   const form = document.createElement('div');
   form.className = 'edit-form';
 
-  const inputFront = document.createElement('input');
-  inputFront.value = card.front;
-  inputFront.placeholder = meta.type === 'latex' ? `${meta.frontInput} (LaTeX)` : meta.frontInput;
-
-  const inputBack = document.createElement('input');
-  inputBack.value = card.back;
-  inputBack.placeholder = meta.type === 'latex' ? `${meta.backInput} (LaTeX)` : meta.backInput;
+  const inputFront = createTextarea(card.front, meta.type === 'latex' ? `${meta.frontInput} (LaTeX)` : meta.frontInput, 3);
+  const inputBack = createTextarea(card.back, meta.type === 'latex' ? `${meta.backInput} (LaTeX)` : meta.backInput, 3);
+  const inputNote = createTextarea(card.note || '', meta.notePh || 'Примеры, пояснение или детали', 3);
 
   const actions = document.createElement('div');
   actions.className = 'edit-actions';
@@ -1118,7 +1243,11 @@ function startEdit(li, index) {
   const saveBtn = document.createElement('button');
   saveBtn.textContent = T.save;
   saveBtn.addEventListener('click', () => {
-    cards[index] = { front: inputFront.value.trim(), back: inputBack.value.trim() };
+    const updatedCard = { front: inputFront.value.trim(), back: inputBack.value.trim() };
+    if (meta.type !== 'latex' && inputNote.value.trim()) {
+      updatedCard.note = inputNote.value.trim();
+    }
+    cards[index] = updatedCard;
     setCards(cards);
     renderCardList();
     resetStudyOrder();
@@ -1133,18 +1262,40 @@ function startEdit(li, index) {
   actions.appendChild(cancelBtn);
   form.appendChild(inputFront);
   form.appendChild(inputBack);
+  if (meta.type !== 'latex') form.appendChild(inputNote);
   form.appendChild(actions);
   li.appendChild(form);
 }
 
 function splitImportedLine(line) {
-  const separator = '|';
-  const index = line.indexOf(separator);
-  if (index > -1) {
-    return [line.slice(0, index).trim(), line.slice(index + separator.length).trim()];
+  const parts = [];
+  let current = '';
+
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '\\' && i + 1 < line.length) {
+      current += ch + line[i + 1];
+      i += 1;
+      continue;
+    }
+    if (ch === '|') {
+      parts.push(current.trim());
+      current = '';
+      continue;
+    }
+    current += ch;
   }
 
-  return null;
+  parts.push(current.trim());
+  return parts;
+}
+
+function decodeImportField(value) {
+  return String(value || '')
+    .trim()
+    .replace(/\\n/g, '\n')
+    .replace(/\\\|/g, '|')
+    .replace(/\\\\/g, '\\');
 }
 
 function parseImportedCards(text) {
@@ -1156,13 +1307,19 @@ function parseImportedCards(text) {
     const line = rawLine.trim();
     if (!line) return;
 
-    const pair = splitImportedLine(line);
-    if (!pair || !pair[0] || !pair[1]) {
+    const parts = splitImportedLine(line);
+    const front = decodeImportField(parts[0]);
+    const back = decodeImportField(parts[1]);
+    const note = decodeImportField(parts.slice(2).join('|'));
+
+    if (!front || !back) {
       skipped += 1;
       return;
     }
 
-    cards.push({ front: pair[0], back: pair[1] });
+    const card = { front, back };
+    if (note) card.note = note;
+    cards.push(card);
   });
 
   return { cards, skipped };
@@ -1202,8 +1359,12 @@ function importCardsFromFile(file) {
   reader.readAsText(file, 'UTF-8');
 }
 
-function normalizeExportText(value) {
-  return String(value || '').replace(/\r?\n/g, ' ').trim();
+function encodeExportField(value) {
+  return String(value || '')
+    .trim()
+    .replace(/\\/g, '\\\\')
+    .replace(/\r?\n/g, '\\n')
+    .replace(/\|/g, '\\|');
 }
 
 function makeSafeFilename(name) {
@@ -1227,7 +1388,11 @@ function exportActiveDeck() {
 
   const meta = getDeckMeta(getActiveDeckId());
   const text = cards
-    .map((card) => `${normalizeExportText(card.front)} | ${normalizeExportText(card.back)}`)
+    .map((card) => {
+      const fields = [encodeExportField(card.front), encodeExportField(card.back)];
+      if (card.note && String(card.note).trim()) fields.push(encodeExportField(card.note));
+      return fields.join(' | ');
+    })
     .join('\n');
 
   const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
@@ -1297,14 +1462,20 @@ document.getElementById('btn-reset-order').addEventListener('click', () => reset
 
 document.getElementById('add-form').addEventListener('submit', (e) => {
   e.preventDefault();
+  const meta = getDeckMeta(getActiveDeckId());
   const front = document.getElementById('input-front').value.trim();
   const back = document.getElementById('input-back').value.trim();
+  const noteInput = document.getElementById('input-note');
+  const note = noteInput ? noteInput.value.trim() : '';
   if (!front || !back) return;
   const cards = getCards();
-  cards.push({ front, back });
+  const newCard = { front, back };
+  if (meta.type !== 'latex' && note) newCard.note = note;
+  cards.push(newCard);
   setCards(cards);
   document.getElementById('input-front').value = '';
   document.getElementById('input-back').value = '';
+  if (noteInput) noteInput.value = '';
   renderCardList();
   resetStudyOrder();
 });
